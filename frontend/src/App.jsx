@@ -161,7 +161,7 @@ const App = () => {
   const mineBlock = async () => {
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:3000/api/blocks/mine');
+      const response = await axios.post(`${API_URL}/api/blocks/mine`);
       setBlocks(response.data.chain);
       setPendingTransactions([]);
       setValidationStatus(response.data.validationStatus);
@@ -178,7 +178,7 @@ const App = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:3000/api/blocks/transaction', {
+      const response = await axios.post(`${API_URL}/api/blocks/transaction`, {
         sender: payer,
         receiver: payee,
         amount: parseFloat(amount),
@@ -201,7 +201,7 @@ const App = () => {
   const checkIntegrity = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3000/api/blocks/validate');
+      const response = await axios.get(`${API_URL}/api/blocks/validate`);
       setValidationStatus(response.data.validationStatus);
       setMessage(response.data.isValid ? 'Blockchain is valid!' : 'Blockchain validation failed!');
     } catch (error) {
@@ -218,7 +218,7 @@ const App = () => {
     }
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:3000/api/blocks/reset');
+      const response = await axios.post(`${API_URL}/api/blocks/reset`);
       setBlocks(response.data.chain);
       setPendingTransactions([]);
       setValidationStatus(response.data.validationStatus);
