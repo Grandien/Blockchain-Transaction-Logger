@@ -8,11 +8,15 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/test', {
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/test';
+mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const App = () => {
   const [loading, setLoading] = useState({
     logging: false,
@@ -24,7 +26,7 @@ const App = () => {
 
   const fetchPendingTransactions = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/blocks/transactions');
+      const response = await axios.get(`${API_URL}/api/blocks/transactions`);
       setPendingTransactions(response.data);
     } catch (error) {
       console.error('Error fetching pending transactions:', error);
@@ -39,7 +41,7 @@ const App = () => {
 
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:3000/api/blocks/transactions/${index}`);
+      await axios.delete(`${API_URL}/api/blocks/transactions/${index}`);
       setMessage('Transaction deleted successfully');
       fetchPendingTransactions();
     } catch (error) {
@@ -53,7 +55,7 @@ const App = () => {
   const fetchBlocks = async () => {
     setLoading(prev => ({ ...prev, fetching: true }));
     try {
-      const res = await axios.get('http://localhost:3000/api/blocks');
+      const res = await axios.get(`${API_URL}/api/blocks`);
       setBlocks(res.data.chain);
       setValidationStatus(res.data.validationStatus);
     } catch (error) {
@@ -70,7 +72,7 @@ const App = () => {
     }
     setLoading(prev => ({ ...prev, logging: true }));
     try {
-      await axios.post('http://localhost:3000/api/blocks/transaction', {
+      await axios.post(`${API_URL}/api/blocks/transaction`, {
         sender: payer,
         receiver: payee,
         amount: parseFloat(amount),
@@ -94,12 +96,12 @@ const App = () => {
   const commitTransactions = async () => {
     setLoading(prev => ({ ...prev, committing: true }));
     try {
-      const pending = await axios.get('http://localhost:3000/api/blocks/transactions');
+      const pending = await axios.get(`${API_URL}/api/blocks/transactions`);
       if (!pending.data || pending.data.length === 0) {
         throw new Error('No pending payments to commit');
       }
 
-      const res = await axios.post('http://localhost:3000/api/blocks/mine');
+      const res = await axios.post(`${API_URL}/api/blocks/mine`);
       setValidationStatus(res.data.validationStatus);
       alert('Payments committed to blockchain!');
       fetchBlocks();
@@ -123,7 +125,7 @@ const App = () => {
     
     setLoading(prev => ({ ...prev, resetting: true }));
     try {
-      const res = await axios.post('http://localhost:3000/api/blocks/reset');
+      const res = await axios.post(`${API_URL}/api/blocks/reset`);
       setValidationStatus(res.data.validationStatus);
       alert('Payment ledger reset successfully!');
       fetchBlocks();
@@ -138,7 +140,7 @@ const App = () => {
 
   const checkTampering = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/blocks/check-tampering');
+      const res = await axios.get(`${API_URL}/api/blocks/check-tampering`);
       if (res.data.tampered) {
         alert('WARNING: Blockchain tampering detected!\nIssues: ' + res.data.issues.join('\n'));
       } else {
