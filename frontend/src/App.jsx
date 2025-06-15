@@ -27,9 +27,11 @@ const App = () => {
   const fetchPendingTransactions = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/blocks/transactions`);
-      setPendingTransactions(response.data);
+      console.log('Pending transactions response:', response.data);
+      setPendingTransactions(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching pending transactions:', error);
+      setPendingTransactions([]);
       setMessage('Failed to fetch pending transactions');
     }
   };
@@ -56,12 +58,18 @@ const App = () => {
     setLoading(prev => ({ ...prev, fetching: true }));
     try {
       const res = await axios.get(`${API_URL}/api/blocks`);
-      setBlocks(res.data.chain || []);
-      setValidationStatus(res.data.validationStatus || {
+      console.log('Blocks response:', res.data);
+      
+      // Ensure we have valid data
+      const chain = Array.isArray(res.data?.chain) ? res.data.chain : [];
+      const validation = res.data?.validationStatus || {
         lastChecked: new Date().toISOString(),
         isValid: true,
         issues: []
-      });
+      };
+
+      setBlocks(chain);
+      setValidationStatus(validation);
     } catch (error) {
       console.error('Error fetching payment history:', error);
       setBlocks([]);
@@ -320,9 +328,9 @@ const App = () => {
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">⏳ Pending Payments</h2>
-          {pendingTransactions.length === 0 ? (
-            <p className="text-gray-500 text-center">No pending payments</p>
-          ) : (
+          {loading.fetching ? (
+            <p className="text-center text-gray-500">Loading pending payments...</p>
+          ) : Array.isArray(pendingTransactions) && pendingTransactions.length > 0 ? (
             <div className="space-y-3">
               {pendingTransactions.map((tx, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -344,6 +352,8 @@ const App = () => {
                 </div>
               ))}
             </div>
+          ) : (
+            <p className="text-center text-gray-500">No pending payments</p>
           )}
         </div>
 
@@ -361,7 +371,7 @@ const App = () => {
 
           {loading.fetching ? (
             <p className="text-center text-gray-500">Loading payment history...</p>
-          ) : blocks && blocks.length > 0 ? (
+          ) : Array.isArray(blocks) && blocks.length > 0 ? (
             blocks.map((block, idx) => (
               <div
                 key={idx}
@@ -374,7 +384,7 @@ const App = () => {
 
                 <p className="mt-4 mb-1 font-semibold text-gray-800">Payments:</p>
                 <ul className="ml-5 list-disc text-sm text-gray-700">
-                  {block.transactions && block.transactions.length > 0 ? (
+                  {Array.isArray(block.transactions) && block.transactions.length > 0 ? (
                     block.transactions.map((tx, i) => (
                       <li key={i} className="mb-2">
                         <div className="flex flex-col">
