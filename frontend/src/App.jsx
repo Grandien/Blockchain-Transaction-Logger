@@ -23,9 +23,25 @@ const App = () => {
   const [amount, setAmount] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        console.log('Initializing data...');
+        await Promise.all([fetchBlocks(), fetchPendingTransactions()]);
+      } catch (err) {
+        console.error('Error initializing data:', err);
+        setError(err.message);
+      }
+    };
+
+    initializeData();
+  }, []);
 
   const fetchPendingTransactions = async () => {
     try {
+      console.log('Fetching pending transactions...');
       const response = await axios.get(`${API_URL}/api/blocks/transactions`);
       console.log('Pending transactions response:', response.data);
       setPendingTransactions(Array.isArray(response.data) ? response.data : []);
@@ -33,6 +49,7 @@ const App = () => {
       console.error('Error fetching pending transactions:', error);
       setPendingTransactions([]);
       setMessage('Failed to fetch pending transactions');
+      setError(error.message);
     }
   };
 
@@ -57,6 +74,7 @@ const App = () => {
   const fetchBlocks = async () => {
     setLoading(prev => ({ ...prev, fetching: true }));
     try {
+      console.log('Fetching blocks...');
       const res = await axios.get(`${API_URL}/api/blocks`);
       console.log('Blocks response:', res.data);
       
@@ -78,6 +96,7 @@ const App = () => {
         isValid: false,
         issues: ['Failed to fetch blockchain data']
       });
+      setError(error.message);
     } finally {
       setLoading(prev => ({ ...prev, fetching: false }));
     }
@@ -248,16 +267,40 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    fetchBlocks();
-    fetchPendingTransactions();
-  }, []);
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+            <button 
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              onClick={() => {
+                setError(null);
+                fetchBlocks();
+                fetchPendingTransactions();
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-blue-800 mb-6 text-center">Blockchain Payment Logger</h1>
         <p className="text-center text-gray-600 mb-8">Securely log and track all your payments on the blockchain</p>
+
+        {message && (
+          <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+            {message}
+          </div>
+        )}
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <div className="flex justify-between items-center mb-4">
