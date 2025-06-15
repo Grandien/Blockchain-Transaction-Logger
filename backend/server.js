@@ -9,7 +9,8 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: ['https://pi-grandine.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
 app.use(express.json());
@@ -31,6 +32,16 @@ blockchain.initialize().then(() => {
     console.log('Blockchain initialized');
 }).catch((error) => {
     console.error('Blockchain initialization error:', error);
+});
+
+// Root route
+app.get('/', (req, res) => {
+    res.json({ message: 'Blockchain Payment Logger API is running' });
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'Backend is working!' });
 });
 
 // Routes
