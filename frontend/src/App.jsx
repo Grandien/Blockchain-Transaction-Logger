@@ -56,11 +56,20 @@ const App = () => {
     setLoading(prev => ({ ...prev, fetching: true }));
     try {
       const res = await axios.get(`${API_URL}/api/blocks`);
-      setBlocks(res.data.chain);
-      setValidationStatus(res.data.validationStatus);
+      setBlocks(res.data.chain || []);
+      setValidationStatus(res.data.validationStatus || {
+        lastChecked: new Date().toISOString(),
+        isValid: true,
+        issues: []
+      });
     } catch (error) {
       console.error('Error fetching payment history:', error);
-      alert('Failed to fetch payment history');
+      setBlocks([]);
+      setValidationStatus({
+        lastChecked: new Date().toISOString(),
+        isValid: false,
+        issues: ['Failed to fetch blockchain data']
+      });
     } finally {
       setLoading(prev => ({ ...prev, fetching: false }));
     }
@@ -342,17 +351,17 @@ const App = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-gray-800">📚 Payment History</h2>
             <div className={`px-3 py-1 rounded text-sm ${
-              validationStatus.isValid 
+              validationStatus?.isValid 
                 ? 'bg-green-100 text-green-800' 
                 : 'bg-red-100 text-red-800'
             }`}>
-              {validationStatus.isValid ? '✓ Valid' : '⚠ Invalid'}
+              {validationStatus?.isValid ? '✓ Valid' : '⚠ Invalid'}
             </div>
           </div>
 
           {loading.fetching ? (
             <p className="text-center text-gray-500">Loading payment history...</p>
-          ) : (
+          ) : blocks && blocks.length > 0 ? (
             blocks.map((block, idx) => (
               <div
                 key={idx}
@@ -384,6 +393,8 @@ const App = () => {
                 </ul>
               </div>
             ))
+          ) : (
+            <p className="text-center text-gray-500">No blocks found</p>
           )}
         </div>
       </div>
