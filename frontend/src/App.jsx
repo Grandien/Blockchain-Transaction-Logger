@@ -291,44 +291,46 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-blue-800 mb-6 text-center">Blockchain Payment Logger</h1>
-        <p className="text-center text-gray-600 mb-8">Securely log and track all your payments on the blockchain</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold text-blue-900 mb-4 tracking-tight">Blockchain Payment Logger</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Securely log and track all your payments on the blockchain with advanced security features</p>
+        </div>
 
         {message && (
-          <div className="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+          <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700 rounded shadow-sm">
             {message}
           </div>
         )}
 
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">📝 Log New Payment</h2>
+        <div className="bg-white p-8 rounded-xl shadow-lg mb-8 border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">📝 Log New Payment</h2>
             <button
               onClick={checkTampering}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+              className="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 shadow-sm"
             >
               Check Integrity
             </button>
           </div>
           <div className="space-y-3">
             <input
-              className="border border-gray-300 p-2 w-full rounded"
+              className="border border-gray-200 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               value={payer}
               onChange={e => setPayer(e.target.value)}
               placeholder="Payer Name"
               disabled={loading.logging}
             />
             <input
-              className="border border-gray-300 p-2 w-full rounded"
+              className="border border-gray-200 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               value={payee}
               onChange={e => setPayee(e.target.value)}
               placeholder="Payee Name"
               disabled={loading.logging}
             />
             <input
-              className="border border-gray-300 p-2 w-full rounded"
+              className="border border-gray-200 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               type="number"
               value={amount}
               onChange={e => setAmount(e.target.value)}
@@ -336,30 +338,30 @@ const App = () => {
               disabled={loading.logging}
             />
             <textarea
-              className="border border-gray-300 p-2 w-full rounded"
+              className="border border-gray-200 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               value={paymentDescription}
               onChange={e => setPaymentDescription(e.target.value)}
               placeholder="Payment Description"
               rows="3"
               disabled={loading.logging}
             />
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-4 pt-3">
               <button
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200 shadow-sm flex-1"
                 onClick={logPayment}
                 disabled={loading.logging}
               >
                 {loading.logging ? 'Logging...' : 'Log Payment'}
               </button>
               <button
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors duration-200 shadow-sm flex-1"
                 onClick={commitTransactions}
                 disabled={loading.committing}
               >
                 {loading.committing ? 'Committing...' : 'Commit to Blockchain'}
               </button>
               <button
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
+                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors duration-200 shadow-sm flex-1"
                 onClick={resetLedger}
                 disabled={loading.resetting}
               >
@@ -369,24 +371,24 @@ const App = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">⏳ Pending Payments</h2>
+        <div className="bg-white p-8 rounded-xl shadow-lg mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">⏳ Pending Payments</h2>
           {loading.fetching ? (
             <p className="text-center text-gray-500">Loading pending payments...</p>
           ) : Array.isArray(pendingTransactions) && pendingTransactions.length > 0 ? (
             <div className="space-y-3">
               {pendingTransactions.map((tx, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors duration-200">
                   <div className="flex-1">
-                    <p className="font-medium">{tx.sender} → {tx.receiver}</p>
-                    <p className="text-sm text-gray-600">{formatToRupiah(tx.amount)}</p>
-                    <p className="text-sm text-gray-600">{tx.description}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-semibold text-gray-800">{tx.sender} → {tx.receiver}</p>
+                    <p className="text-sm font-medium text-blue-600">{formatToRupiah(tx.amount)}</p>
+                    <p className="text-sm text-gray-600 mt-1">{tx.description}</p>
+                    <p className="text-xs text-gray-500 mt-2">
                       {new Date(Number(tx.timestamp)).toLocaleString()}
                     </p>
                   </div>
                   <button
-                    className="ml-4 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                    className="ml-4 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors duration-200 shadow-sm"
                     onClick={() => deleteTransaction(index)}
                     disabled={loading.deleting}
                   >
@@ -400,13 +402,13 @@ const App = () => {
           )}
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold text-gray-800">📚 Payment History</h2>
-            <div className={`px-3 py-1 rounded text-sm ${
+        <div className="bg-white p-8 rounded-xl shadow-lg mb-8 border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">📚 Payment History</h2>
+            <div className={`px-4 py-2 rounded-lg text-sm font-medium ${
               validationStatus?.isValid 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-red-100 text-red-800'
+                ? 'bg-green-50 text-green-700 border border-green-200' 
+                : 'bg-red-50 text-red-700 border border-red-200'
             }`}>
               {validationStatus?.isValid ? '✓ Valid' : '⚠ Invalid'}
             </div>
